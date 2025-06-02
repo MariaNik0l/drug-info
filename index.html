@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Πληροφορίες Φαρμάκων</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      line-height: 1.6;
+      padding: 2em;
+      background: #f9f9f9;
+    }
+    .drug {
+      padding: 1em;
+      margin-bottom: 2em;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    h2 {
+      color: #1565C0;
+    }
+    h3 {
+      margin-top: 1em;
+    }
+    .section {
+      margin-top: 1em;
+    }
+    .blue { color: #1565C0; font-weight: bold; }
+    .green { color: #388E3C; font-weight: bold; }
+    .yellow { color: #FBC02D; font-weight: bold; }
+    .red { color: #D32F2F; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>📘 Πληροφορίες Δραστικών Ουσιών</h1>
+<p>Μπορείς να μεταβείς απευθείας με σύνδεσμο όπως: <br>
+<code>https://το-όνομά-σου.github.io/drug-info/index.html#N06DA03</code>
+</p>
+
+<div id="content">Φόρτωση...</div>
+
+<script>
+fetch('drug_info.json')
+  .then(r => r.json())
+  .then(data => {
+    const content = document.getElementById('content');
+    content.innerHTML = '';
+
+    for (const [code, info] of Object.entries(data)) {
+      const div = document.createElement('div');
+      div.className = 'drug';
+      div.id = code;
+
+      const names = Array.isArray(info["ΟΝΟΜΑΣΙΑ"]) ? info["ΟΝΟΜΑΣΙΑ"].join(', ') : info["ΟΝΟΜΑΣΙΑ"];
+      const antidotes = Array.isArray(info["ΑΝΤΕΝΔΕΙΞΕΙΣ"]) ? info["ΑΝΤΕΝΔΕΙΞΕΙΣ"].join('<br>') : info["ΑΝΤΕΝΔΕΙΞΕΙΣ"];
+
+      div.innerHTML = `
+        <h2>${names} (${code})</h2>
+        <div class="section green">💊 <strong>ΧΟΡΗΓΗΣΗ:</strong><br>${info["ΧΟΡΗΓΗΣΗ"] || "—"}</div>
+        <div class="section yellow">⚠️ <strong>ΠΑΡΕΝΕΡΓΕΙΕΣ:</strong><br>${info["ΠΑΡΕΝΕΡΓΕΙΕΣ"] || "—"}</div>
+        <div class="section red">❌ <strong>ΑΝΤΕΝΔΕΙΞΕΙΣ:</strong><br>${antidotes || "—"}</div>
+      `;
+      content.appendChild(div);
+    }
+
+    // scroll to anchor if exists
+    if (location.hash) {
+      const target = document.querySelector(location.hash);
+      if (target) target.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+</script>
+
+</body>
+</html>
